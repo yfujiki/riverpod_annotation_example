@@ -12,7 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'riverpod_examples.dart';
 
 class RiverpodExampleWidget extends ConsumerWidget {
-  const RiverpodExampleWidget({Key? key}) : super(key: key);
+  const RiverpodExampleWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -266,6 +266,8 @@ class RiverpodExampleWidget extends ConsumerWidget {
 
 // Main app
 class RiverpodDemo extends StatelessWidget {
+  const RiverpodDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
