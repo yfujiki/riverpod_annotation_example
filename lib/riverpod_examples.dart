@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -9,7 +8,7 @@ part 'riverpod_examples.g.dart';
 // 1. Provider Example
 // ----------------------
 @riverpod
-String helloWorld(HelloWorldRef ref) {
+String helloWorld(Ref ref) {
   return 'Hello world';
 }
 
@@ -20,7 +19,7 @@ String helloWorld(HelloWorldRef ref) {
 // 2. FutureProvider Example
 // ----------------------
 @riverpod
-Future<List<String>> fetchUserNames(FetchUserNamesRef ref) async {
+Future<List<String>> fetchUserNames(Ref ref) async {
   // Simulate API call with a delay
   await Future.delayed(const Duration(seconds: 2));
   return ['Alice', 'Bob', 'Charlie', 'David'];
@@ -38,7 +37,7 @@ Future<List<String>> fetchUserNames(FetchUserNamesRef ref) async {
 // 3. StreamProvider Example
 // ----------------------
 @riverpod
-Stream<int> counter(CounterRef ref) {
+Stream<int> counter(Ref ref) {
   return Stream.periodic(
     const Duration(seconds: 1),
     (count) => count,
