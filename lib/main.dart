@@ -219,7 +219,7 @@ class RiverpodExampleWidget extends ConsumerWidget {
             ),
           ),
 
-          // StreamNotifierProvider example
+          // StreamNotifierProvider example with RxDart
           Card(
             child: Padding(
               padding: EdgeInsets.all(16),
@@ -227,7 +227,7 @@ class RiverpodExampleWidget extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'StreamNotifierProvider Example',
+                    'StreamNotifierProvider Example (RxDart)',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
@@ -249,6 +249,55 @@ class RiverpodExampleWidget extends ConsumerWidget {
                                   child: Text('• $message'),
                                 ),
                               ),
+                            SizedBox(height: 12),
+                            // Add a text field and button to send messages
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Type a message',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    onSubmitted: (value) {
+                                      if (value.isNotEmpty) {
+                                        ref
+                                            .read(
+                                              messageStreamNotifierProvider
+                                                  .notifier,
+                                            )
+                                            .sendMessage(value);
+                                      }
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed:
+                                      () => ref
+                                          .read(
+                                            messageStreamNotifierProvider
+                                                .notifier,
+                                          )
+                                          .sendMessage(
+                                            'Hello ${DateTime.now().second}',
+                                          ),
+                                  child: Text('Send'),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed:
+                                  () =>
+                                      ref
+                                          .read(
+                                            messageStreamNotifierProvider
+                                                .notifier,
+                                          )
+                                          .clearMessages(),
+                              child: Text('Clear Messages'),
+                            ),
                           ],
                         ),
                     loading: () => Center(child: CircularProgressIndicator()),

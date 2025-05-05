@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:rxdart/subjects.dart';
 
 // This creates a file called 'riverpod_examples.g.dart'
 part 'riverpod_examples.g.dart';
@@ -126,35 +129,62 @@ class TodosNotifier extends _$TodosNotifier {
 // ----------------------
 @riverpod
 class MessageStreamNotifier extends _$MessageStreamNotifier {
-  Stream<String>? _messageStream;
+  // Add this to your dependencies in pubspec.yaml:
+  // rxdart: ^0.27.7
+
+  late final BehaviorSubject<List<String>> _messagesSubject;
 
   @override
   Stream<List<String>> build() {
-    // Initialize an empty list
-    final messages = <String>[];
+    // Initialize the BehaviorSubject with an empty list
+    _messagesSubject = BehaviorSubject<List<String>>.seeded([]);
 
-    // Create a stream that accumulates messages
-    _messageStream = Stream.periodic(
+    // Periodically add demo messages
+    final periodicMessagesSubscription = Stream.periodic(
       const Duration(seconds: 3),
-      (i) => 'Message ${i + 1}',
-    ).take(5);
-
-    return _messageStream!.map((message) {
-      messages.add(message);
-      return List.of(messages); // Return a new list each time
+      (i) => 'System message ${i + 1}',
+    ).take(5).listen((message) {
+      final currentMessages = _messagesSubject.value;
+      currentMessages.add(message);
+      _messagesSubject.add(
+        List.of(currentMessages),
+      ); // Add a new list to trigger updates
     });
+
+    // Make sure to cancel the subscription when the provider is disposed
+    ref.onDispose(() {
+      periodicMessagesSubscription.cancel();
+      _messagesSubject.close();
+    });
+
+    // Return the subject as a stream
+    return _messagesSubject.stream;
   }
 
   void sendMessage(String message) {
-    // In a real app, this would send the message to a backend
-    // and the new message would come through the stream
+    // Get the current messages
+    final currentMessages = _messagesSubject.value;
 
-    // Here we're just simulating the process
-    // The actual implementation would depend on your backend
+    // Add the new message
+    currentMessages.add('User: $message');
+
+    // Emit a new list (important for reactivity)
+    _messagesSubject.add(List.of(currentMessages));
+
+    // In a real app with a backend, you might do something like:
+    // 1. Send the message to your backend API
+    // 2. The backend would then broadcast the message to all clients
+    // 3. Your app would receive the message via a WebSocket or similar
+    // 4. That would update the BehaviorSubject
   }
 
   void clearMessages() {
-    // In a real app, this might reset the stream or clear messages on backend
-    // For demonstration purposes, we're not implementing the full logic
+    // Reset to an empty list
+    _messagesSubject.add([]);
+
+    // In a real app, you might also want to:
+    // 1. Send a request to your backend to clear chat history
+    // 2. Handle any success/failure responses
+    // 3. Update the UI accordingly
   }
 }
